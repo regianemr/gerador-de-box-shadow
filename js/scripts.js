@@ -53,6 +53,15 @@ class BoxShadowGenerator {
         this.mozRule.innerText = this.currentRule;
     }
 
+    updateValue(type, value) {
+        switch(type) {
+            case "horizontal":
+                this.horizontalRef.value = value;
+        }
+
+        this.applyRule();
+        this.showRule();
+    }
 }
 
 // Seleção de elementos
@@ -90,3 +99,9 @@ boxShadow.initialize()
 
 
 // Eventos
+
+horizontal.addEventListener("input", (e) => {
+    const value = e.target.value
+
+    boxShadow.updateValue("horizontal", value)
+})
