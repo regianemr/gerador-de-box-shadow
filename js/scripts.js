@@ -32,6 +32,7 @@ class BoxShadowGenerator {
         this.opacity = opacity;
         this.opacityRef = opacityRef;
         this.inset = inset;
+        this.insetRef = inset.checked
         this.previewBox = previewBox;
         this.rule = rule;
         this.webkitRule = webkitRule;
@@ -44,6 +45,9 @@ class BoxShadowGenerator {
         this.verticalRef.value = this.vertical.value
         this.spreadRef.value = this.spread.value
         this.blurRef.value = this.blur.value
+        this.colorRef.value = this.color.value
+        this.opacityRef.value = this.opacity.value
+
 
         this.applyRule()
         this.showRule()
@@ -52,8 +56,12 @@ class BoxShadowGenerator {
 
     applyRule() {
 
-        this.previewBox.style.boxShadow = `${this.horizontalRef.value}px ${this.verticalRef.value}px ${this.blurRef.value}px ${this.spreadRef.value}px #000000`
-        this.currentRule = this.previewBox.style.boxShadow;
+        const rgbValue = this.hexToRgb(this.colorRef.value)
+    const shadowRule = `${this.insetRef ? "inset" : ""} ${this.horizontalRef.value}px ${this.verticalRef.value}px ${this.blurRef.value}px ${this.spreadRef.value}px rgba(${rgbValue}, ${this.opacityRef.value})` 
+
+
+        this.previewBox.style.boxShadow = shadowRule;
+        this.currentRule = shadowRule;
     }
 
     showRule() {
@@ -77,10 +85,25 @@ class BoxShadowGenerator {
             case "spread":
                 this.spreadRef.value = value;
                 break
+            case "color":
+                this.colorRef.value = value;
+                break
+            case "opacity": 
+                this.opacityRef.value = value;
+                break
+            case "inset": 
+                this.insetRef = value;
+                break
         }
 
         this.applyRule();
         this.showRule();
+    }
+
+    hexToRgb(hex) {
+        return `${("0x" + hex[2]) | 0}, ${("0x" + hex[3] + hex[4]) | 0}, ${
+            ("0x" + hex[5] + hex[6]) | 0
+        }`
     }
 }
 
@@ -158,4 +181,41 @@ blur.addEventListener("input", (e) => {
     const value = e.target.value
 
     boxShadow.updateValue("blur", value)
+})
+
+color.addEventListener("input", (e) => {
+    const value = e.target.value
+
+    boxShadow.updateValue("color", value)
+})
+
+opacity.addEventListener("input", (e) => {
+    const value = e.target.value
+
+    boxShadow.updateValue("opacity", value)
+})
+
+inset.addEventListener("input", (e) => {
+    const value = e.target.checked
+
+    boxShadow.updateValue("inset", value)
+})
+
+// copiar regra
+const rulesArea = document.querySelector("#rules-area")
+const copyInstructions = document.querySelector("#copy-instructions")
+
+rulesArea.addEventListener("click", () => {
+    const rules = rulesArea.innerText.replace(/^\s*\n/gm, "");
+
+    navigator.clipboard.writeText(rules).then(() => {
+        copyInstructions.innerText = "Regra copiada com sucesso!"
+
+
+        setTimeout(() => {
+            copyInstructions.innerText = 
+            "Clique no quadro acima para copiar as regras."
+        }, 1000)
+    })
+
 })
